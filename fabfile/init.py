@@ -47,7 +47,8 @@ def install_nltk():
 
 @task
 def install_zpar():
-    local('pip install python-zpar')
+    with virtualenv(VENV_DIR):
+        local('pip install python-zpar')
 
 
 @task
