@@ -29,6 +29,14 @@ class Timer(object):
         return '%s\t%.2f ms / doc' % (self.name, self.msecs / self.n)
 
 
+# The code here is quite repetitive, by choice.
+# Because these scripts all just dispatch a bunch of jobs, I find it easier to
+# read the list of commands in sequence, instead of following wrappers upon
+# wrappers.
+# This also makes it easier to understand any one function independently, and to
+# update them independently in ad hoc ways.
+
+
 @task
 def tok(n=1000):
     n = int(n)
@@ -42,7 +50,6 @@ def tok(n=1000):
         with Timer('nltk', n) as nltk_time:
             local('time bin/run_nltk.py -n %d %s' % (n, GIGA_LOC))
 
-
     print("Milliseconds per document of the tokenizers:")
     print(noop_time)
     print(split_time)
@@ -51,15 +58,24 @@ def tok(n=1000):
 
 
 @task
-def tag(n=1000):
+def tag(n=1000, to_run='snz'):
+    do_spacy = 's' in to_run
+    do_zpar = 'z' in to_run
+    do_nltk = 'n' in to_run
     n = int(n)
     with virtualenv(VENV_DIR):
-        print("Milliseconds per document of the tokenizers:")
         with Timer('spacy', n) as spacy_time:
-            local('time bin/run_spacy.py -t -n %d %s' % (n, GIGA_LOC))
+            if do_spacy:
+                local('time bin/run_spacy.py -t -n %d %s' % (n, GIGA_LOC))
         with Timer('nltk', n) as nltk_time:
-            local('time bin/run_nltk.py -t -n %d %s' % (n, GIGA_LOC))
+            if do_nltk:
+                local('time bin/run_nltk.py -t -n %d %s' % (n, GIGA_LOC))
+        with Timer('zpar', n) as zpar_time:
+            if do_zpar:
+                local('time bin/run_zpar.py -t -n %d %s' % (n, GIGA_LOC))
+        print("Milliseconds per document of the taggers:")
         print(spacy_time)
+        print(zpar_time)
         print(nltk_time)
 
 
@@ -70,5 +86,5 @@ def parse(n=1000):
         with Timer('spacy', n) as spacy_time:
             local('time bin/run_spacy.py -t -p -n %d %s' % (n, GIGA_LOC))
 
-    print("Milliseconds per document of the tokenizers:")
+    print("Milliseconds per document of the parsers:")
     print(spacy_time)
