@@ -81,10 +81,16 @@ def tag(n=1000, to_run='snz'):
 
 @task
 def parse(n=1000):
+    do_spacy = 's' in to_run
+    do_zpar = 'z' in to_run
     n = int(n)
     with virtualenv(VENV_DIR):
         with Timer('spacy', n) as spacy_time:
-            local('time bin/run_spacy.py -t -p -n %d %s' % (n, GIGA_LOC))
-
-    print("Milliseconds per document of the parsers:")
-    print(spacy_time)
+            if do_spacy:
+                local('time bin/run_spacy.py -t -p -n %d %s' % (n, GIGA_LOC))
+        with Timer('zpar', n) as zpar_time:
+            if do_zpar:
+                local('time bin/run_zpar.py -t -p -n %d %s' % (n, GIGA_LOC))
+        print("Milliseconds per document of the parsers:")
+        print(spacy_time)
+        print(zpar_time)
