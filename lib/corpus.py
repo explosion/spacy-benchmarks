@@ -37,7 +37,7 @@ class DocsDB(object):
 class Gigaword(DocsDB):
     @classmethod
     def create(cls, giga_dir, db_loc):
-
+        print giga_dir, db_loc
         if path.exists(db_loc):
             os.unlink(db_loc)
         conn = sqlite3.connect(db_loc)
