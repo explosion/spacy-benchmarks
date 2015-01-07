@@ -49,7 +49,11 @@ def install_nltk():
 def install_zpar():
     with virtualenv(VENV_DIR):
         local('pip install python-zpar')
-    local('wget http://downloads.sourceforge.net/project/zpar/0.7/english.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fzpar%2Ffiles%2F0.7%2F&ts=1420629795&use_mirror=softlayer-sng') 
+    local('wget http://downloads.sourceforge.net/project/zpar/0.7/english.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fzpar%2Ffiles%2F0.7%2F&ts=1420629795&use_mirror=softlayer-sng')
+    local('mv english.zip models/')
+    with lcd('models'):
+        local('unzip english.zip')
+        local('mv english/ zpar/')
 
 
 @task
