@@ -53,3 +53,8 @@ def install_zpar():
 @task
 def install_stanford():
     pass
+
+
+@task
+def install_turbo():
+    pass
