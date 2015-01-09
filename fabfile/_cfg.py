@@ -1,7 +1,9 @@
 from os import path
+from pathlib import Path
 
 
-HERE = path.dirname(__file__)
-DATA_DIR = path.join(HERE, '..', 'data')
-VENV_DIR = path.join(HERE, '..', '.env')
-GIGA_LOC = path.join(DATA_DIR, 'gigaword.db')
+HERE = Path(path.dirname(__file__))
+DATA_DIR = HERE.parent / Path('data')
+VENV_DIR = HERE.parent / Path('.env')
+CACHE_DIR = HERE.parent / Path('cache')
+GIGA_LOC = DATA_DIR / Path('gigaword.db')
