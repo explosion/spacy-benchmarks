@@ -2,3 +2,5 @@
 *.pyc
 .env/
 data/
+cache/
+ext/
