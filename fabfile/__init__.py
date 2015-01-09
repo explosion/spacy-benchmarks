@@ -1,3 +1,3 @@
-import setup
+import init
 import corpus
 import speed
