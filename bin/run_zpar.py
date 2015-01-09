@@ -16,15 +16,19 @@ def main(giga_db_loc, n_docs, pos_tag=False, parse=False):
     docs = Gigaword(giga_db_loc, limit=n_docs)
     sbd = nltk.data.load('tokenizers/punkt/english.pickle')
     from zpar import ZPar
-    sbd = nltk.data.load('tokenizers/punkt/english.pickle')
-    with ZPar('english') as z:
+    n = 0
+    with ZPar('models/zpar') as z:
         tagger = z.get_tagger()
+        if parse:
+            parser = z.get_depparser()
         for doc in docs:
             sentences = sbd.tokenize(doc)
             for sent in sentences:
-                if pos_tag:
-                    tags = tagger.tag_sentence(sent)
-                    n = len(tags)
+                if parse:
+                    dep_parsed_sent = parser.dep_parse_sentence(sent)
+                elif pos_tag:
+                    tags = parser.tag_sentence(sent)
+                n += len(sent)
     print n
 
 
