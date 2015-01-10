@@ -54,7 +54,7 @@ def init(lang="python2.7"):
 
 
 @task
-def make_env(lang="python2.7"):
+def env(lang="python2.7"):
     if VENV_DIR.exists():
         local('rm -rf %s' % VENV_DIR)
     local('virtualenv -p %s %s' % (lang, VENV_DIR))
@@ -64,20 +64,20 @@ def make_env(lang="python2.7"):
 
 
 @task
-def install_spacy():
+def spacy():
     with virtualenv(str(VENV_DIR)):
         local('pip install spacy')
 
 
 @task
-def install_nltk():
+def nltk():
     with virtualenv(str(VENV_DIR)):
         local('pip install numpy')
         local('pip install nltk')
 
 
 @task
-def install_zpar():
+def zpar():
     with virtualenv(str(VENV_DIR)):
         local('pip install python-zpar')
     download(URLS['zpar'])
@@ -87,7 +87,7 @@ def install_zpar():
 
 
 @task
-def install_stanford():
+def stanford():
     stanford_dir = Path('ext/stanford')
     if not stanford_dir.exists():
         stanford_dir.mkdirs()
@@ -98,8 +98,3 @@ def install_stanford():
     download(Path(FILENAMES['corenlp-sr']), URLS['corenlp-sr'])
     with virtualenv(str(VENV_DIR)):
         local('pip install https://github.com/honnibal/stanford_corenlp_pywrapper/archive/master/zip')
-
-
-@task
-def install_turbo():
-    pass
