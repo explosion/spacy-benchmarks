@@ -25,81 +25,30 @@ class Timer(object):
         self.end = time.time()
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
-        print(self.name, 'finished in', '%.2fs' % self.secs)
 
     def __str__(self):
         return '%s\t%.2f ms / doc' % (self.name, self.msecs / self.n)
 
 
-@task
-def tok(n=1000):
-    n = int(n)
-    with virtualenv(str(VENV_DIR)):
-        with Timer('noop', n) as noop_time:
-            local('time bin/run_noop.py %s %d' % (GIGA_LOC, n))
-        with Timer('split', n) as split_time:
-            local('time bin/run_split.py %s %d' % (GIGA_LOC, n))
-        with Timer('spacy', n) as spacy_time:
-            local('time bin/run_spacy.py -n %d %s' % (n, GIGA_LOC))
-        with Timer('nltk', n) as nltk_time:
-            local('time bin/run_nltk.py -n %d %s' % (n, GIGA_LOC))
+@task(default=True)
+def run(mode, *systems, **kwargs):
+    n = int(kwargs.get('n', 1000))
+    flags_str = _parse_mode_string(mode)
 
-    print("Milliseconds per document of the tokenizers:")
-    print(noop_time)
-    print(split_time)
-    print(spacy_time)
-    print(nltk_time)
+    cmd = './bin/run_{name}.py {mode} -n {n} {giga_loc}'
+    for name in systems:
+        with Timer(name, n) as timer:
+            with virtualenv(str(VENV_DIR)):
+                local(cmd.format(name=name, mode=flags_str, n=n, giga_loc=GIGA_LOC))
+        print(timer)
 
 
-@task
-def tag(n=1000, to_run='csnz'):
-    do_spacy = 's' in to_run
-    do_zpar = 'z' in to_run
-    do_nltk = 'n' in to_run
-    do_corenlp = 'c' in to_run
-    if platform.system() != 'Darwin':
-        do_zpar = False
-    n = int(n)
-    with virtualenv(str(VENV_DIR)):
-        with Timer('corenlp', n) as corenlp_time:
-            if do_corenlp:
-                local('time bin/run_stanford.py -t -n %d %s' % (n, GIGA_LOC))
-        with Timer('spacy', n) as spacy_time:
-            if do_spacy:
-                local('time bin/run_spacy.py -t -n %d %s' % (n, GIGA_LOC))
-        with Timer('nltk', n) as nltk_time:
-            if do_nltk:
-                local('time bin/run_nltk.py -t -n %d %s' % (n, GIGA_LOC))
-        with Timer('zpar', n) as zpar_time:
-            if do_zpar:
-                local('time bin/run_zpar.py -t -n %d %s' % (n, GIGA_LOC))
-        print("Milliseconds per document of the taggers:")
-        print(spacy_time)
-        print(corenlp_time)
-        print(zpar_time)
-        print(nltk_time)
-
-
-@task
-def parse(n=1000, to_run='csnz'):
-    do_spacy = 's' in to_run
-    do_zpar = 'z' in to_run
-    do_nltk = 'n' in to_run
-    do_corenlp = 'c' in to_run
-    if platform.system() != 'Darwin':
-        do_zpar = False
-    n = int(n)
-    with virtualenv(str(VENV_DIR)):
-        with Timer('corenlp', n) as corenlp_time:
-            if do_corenlp:
-                local('time bin/run_stanford.py -t -p -n %d %s' % (n, GIGA_LOC))
-        with Timer('spacy', n) as spacy_time:
-            if do_spacy:
-                local('time bin/run_spacy.py -t -p -n %d %s' % (n, GIGA_LOC))
-        with Timer('zpar', n) as zpar_time:
-            if do_zpar:
-                local('time bin/run_zpar.py -t -p -n %d %s' % (n, GIGA_LOC))
-        print("Milliseconds per document of the parsers:")
-        print(spacy_time)
-        print(corenlp_time)
-        print(zpar_time)
+def _parse_mode_string(mode):
+    if mode == 'tok':
+        return ''
+    if mode == 'tag':
+        return '-t'
+    elif mode == 'parse':
+        return '-p'
+    else:
+        raise ValueError('Invalid mode: got %s, should be one of [tok, tag, parse]' % mode)
