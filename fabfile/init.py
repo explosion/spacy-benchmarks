@@ -97,7 +97,7 @@ def install_stanford():
     unzip_into(path, stanford_dir)
     download(Path(FILENAMES['corenlp-sr']), URLS['corenlp-sr'])
     with virtualenv(str(VENV_DIR)):
-        local('pip install ext/stanford/stanford_corenlp_pywrapper/')
+        local('pip install https://github.com/honnibal/stanford_corenlp_pywrapper/archive/master/zip')
 
 
 @task
