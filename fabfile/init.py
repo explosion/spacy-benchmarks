@@ -43,12 +43,12 @@ def unzip_into(archive, dest_dir):
 def init(lang="python2.7"):
     if not CACHE_DIR.exists():
         CACHE_DIR.mkdir()
-    make_env(lang)
-    install_spacy()
-    install_nltk()
-    install_zpar()
-    install_stanford()
-    install_turbo()
+    env()
+    spacy()
+    nltk()
+    zpar()
+    stanford()
+    turbo()
     if not DATA_DIR.exists():
         DATA_DIR.mkdir()
 
@@ -57,7 +57,7 @@ def init(lang="python2.7"):
 def env(lang="python2.7"):
     if VENV_DIR.exists():
         local('rm -rf %s' % VENV_DIR)
-    local('virtualenv -p %s %s' % (lang, VENV_DIR))
+    local('python -m virtualenv -p %s %s' % (lang, VENV_DIR))
     with virtualenv(str(VENV_DIR)):
         local('pip install setuptools==9.0')
         local('pip install plac')
@@ -80,7 +80,7 @@ def nltk():
 def zpar():
     with virtualenv(str(VENV_DIR)):
         local('pip install python-zpar')
-    download(URLS['zpar'])
+    download(Path(FILENAMES['zpar']), URLS['zpar'])
     with lcd('models'):
         local('unzip english.zip')
         local('mv english/ zpar/')
