@@ -2,6 +2,8 @@
 
 # Runtime performance comparison of spaCy against other NLP libraries
 
+> ⚠️ **This repository is old and deprecated.** For up-to-date benchmark scripts, see the [`projects`](https://github.com/explosion/projects/) repo.
+
 ## Set up the corpus DB
 
 The speed test expects to read documents from a simple SQLite table. More corpus
